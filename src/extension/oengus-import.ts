@@ -182,24 +182,25 @@ async function importSchedule(marathonShort: string, useJapanese: boolean): Prom
         };
         const playerTwitch = runner.connections
           ?.find((c) => c.platform === 'TWITCH')?.username || runner.twitchName;
+        const playerTwitter = runner.connections
+            ?.find((c) => c.platform === 'TWITTER')?.username || runner.twitterName;
         const playerPronouns = typeof runner.pronouns === 'string'
           ? runner.pronouns.split(',')
           : runner.pronouns;
         const player: RunDataPlayer = {
           name: (useJapanese && runner.usernameJapanese)
-            ? runner.usernameJapanese : runner.username,
+            ? runner.usernameJapanese : runner.displayName,
           id: uuid(),
           teamID: team.id,
           social: {
             twitch: playerTwitch || undefined,
+            twitter: playerTwitter || undefined,
           },
           country: runner.country?.toLowerCase() || undefined,
           pronouns: playerPronouns?.join(', ') || undefined,
           customData: {},
         };
         if (!config.oengus.disableSpeedrunComLookup) {
-          const playerTwitter = runner.connections
-            ?.find((c) => c.platform === 'TWITTER')?.username || runner.twitterName;
           const playerSrcom = runner.connections
             ?.find((c) => c.platform === 'SPEEDRUNCOM')?.username || runner.speedruncomName;
           const data = await searchForUserDataMultiple(
@@ -215,6 +216,7 @@ async function importSchedule(marathonShort: string, useJapanese: boolean): Prom
               const tURL = data.twitch?.uri || undefined;
               player.social.twitch = getTwitchUserFromURL(tURL);
             }
+            if (!playerTwitter) ?.find((c) => c.platform === 'TWITTER')?.username || runner.twitterName;
             if (!runner.country) player.country = data.location?.country.code || undefined;
             if (!runner.pronouns?.length) {
               player.pronouns = data.pronouns?.toLowerCase() || undefined;
